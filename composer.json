@@ -1,0 +1,38 @@
+{
+    "name": "xcranium/kdb",
+    "type": "package",
+    "license": "MIT",
+    "authors": [
+	{
+	    "name": "Eduardo Luz",
+	    "email": "eduluz1976@gmail.com"
+	}
+    ],
+
+    "package": {
+	"name": "xcranium/kdb",
+	"version": "dev-master",
+	"source": {
+	    "url": "git@github.com:eduluz1976/xcranium-kdb.git",
+	    "type": "git",
+	    "reference": "master"
+	}
+    },
+
+    "homepage": "http://www.xcranium.com",
+    "require": {
+	"php": "^5.5 | ^7.0",
+	"phpunit/phpunit": "^4.8"
+    },
+    "require-dev": {
+	"phpunit/phpunit-skeleton-generator": "*"
+    },
+    "autoload": {
+	"ps-4": {
+	    "xcranium\\kdb\\": "src"
+	}
+    },
+    "scripts": {
+	"test": "phpunit"
+    }
+}
