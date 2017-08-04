@@ -9,7 +9,7 @@ class KDB {
     protected $textDefinition = false;
     protected $lsVars = [];
     protected $lsTags = [];
-    
+    protected $lsTargets = [];
     
     
     /**
@@ -94,7 +94,7 @@ class KDB {
     }
     
     
-    public function queryTag($tagName) {
+    public function queryTag($tagName, $setTarget=false) {
 	$resp = [];
 	
 	$tag = $this->lsTags[$tagName];
@@ -103,6 +103,10 @@ class KDB {
 	$resp['refs'] = $refs;
 	$resp['values'] = [];
 	foreach ($refs as $k) {
+	    if ($setTarget) {
+		$this->lsTargets[] = $k;
+	    }
+	    
 	    $resp['values'][$k] = $this->lsVars[$k]->getValue();
 	}
 	
@@ -120,19 +124,128 @@ class KDB {
 	$this->lsVars[$varName]->setValue($varValue);
     }
     
+    public function getValue($varName, $setTarget=false) {
+	if ($setTarget) {
+	    $this->lsTargets[] = $varName;
+	}
+	
+	return $this->getVar($varName)->getValue();
+    }
+    
+    public function getVar($varName) {
+	if (array_key_exists($varName, $this->lsVars)) {
+	    return $this->lsVars[$varName];	
+	} else {
+	    throw new KException("getVar error - $varName ");
+	}
+	
+    }
     
     /**
      * 
      * @param callable $callback
+     * @param boolean $forceAll
      */
-    public function evaluate($callback=false) {
+    public function evaluate($callback=false, $forceAll=false) {
 	// try to figurate which variables must be evaluated (chaining) and which 
 	// should be updated
+	
+	foreach ($this->lsVars as $varName => $varObj) {
+	    KFormula::$vars[$varName] = $varObj->getValue();
+	}
+	
+
+	
+	$ls = $this->lsTargets;
+			
+	$resp = $this->iterateEvaluation($ls,true);
+	
+	
+	return $resp;
 	
 	// try to find if will happen any looping (circular reference)
 	
 	// if have a valid callback, execute it when finish the processing
 	
+    }
+    
+    
+    
+    protected function iterateEvaluation($ls,$first=false) {
+	
+	$lsResp = [];
+	
+	$ls2 = [];
+//	
+//	if ($first) {
+//	    print_r($ls);
+////	    $ls2 = $ls;
+//	}
+	
+	foreach ($ls as $varName) {
+	    if ($this->getVar($varName)->isMissing()) {
+		$ls2[] = $varName;
+	    } 
+	}
+	
+	$ls3 = [];
+
+	
+	foreach ($ls2 as $varName) {
+	    $ls3 = array_merge($ls3, $this->getVar($varName)->getLsRefs() );
+	}
+	
+	
+	$ls4 = [];
+	
+
+	
+	for($i=0;$i<count($ls3);$i++) {
+	    
+	    if (substr($ls3[$i],0,1)=='@') {
+		//
+	    } else { 
+		$varName = $ls3[$i];
+
+		if (substr($varName,0,1)=='$') {
+		    $varName = substr($varName,1);
+
+		    if ($this->getVar($varName)->isMissing()) {
+			$ls4[] = $varName;
+		    }
+
+		}
+	    }
+	    
+	}
+	
+	
+	
+	
+	if (!empty($ls4)) {
+	    $ls4 = array_merge($ls4, $this->iterateEvaluation($ls4));
+	}
+	
+	
+	if ($first) {
+//	    print_r($ls);
+	    $ls4 = array_merge($ls4,$ls);
+//	    print_r($ls4);
+//	    exit;
+	}
+	
+	foreach ($ls4 as $varName) {
+	    
+	    $formula = $this->getVar($varName)->getFormula();
+	    if ($formula) {
+		echo "\n === $varName ";
+		$result = KFormula::evaluate($formula);
+	    }
+	}
+	
+	$lsResp = $ls4;
+	
+	return $lsResp;
     }
     
 }

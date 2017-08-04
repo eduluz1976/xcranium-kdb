@@ -11,8 +11,9 @@ class KVar {
     protected $name;
     protected $value = 'NULL';
     protected $lsRefs = [];
-    
-    
+    protected $isMissing = true;
+
+
     public function __construct($name, $defs) {
 	$this->name = $name;
 //	$this->defs = $defs;
@@ -29,6 +30,11 @@ class KVar {
 	    
 	}
 	
+    }
+    
+    
+    public function getLsRefs() {
+	return $this->lsRefs;
     }
     
     protected function analyze($v) {
@@ -59,6 +65,7 @@ class KVar {
     
     public function setValue($value) {
 	$this->value = $value;
+	$this->isMissing = false;
     }
     
     
@@ -73,5 +80,17 @@ class KVar {
     public function getMeta() {
 	return json_decode(json_encode($this),true);
     }
+    
+    public function isMissing() {
+	return $this->isMissing;
+    }
+    
+    public function getFormula() {
+	if (property_exists($this, "formula")) {
+	    return $this->formula;
+	}
+	return null;
+    }
+    
     
 }
