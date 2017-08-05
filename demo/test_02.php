@@ -24,7 +24,6 @@ KDB::createNewDB("teste1")
 $x = KDB::get("teste1");
 echo "<pre>";
 //$x->setValue('idade', 37);
-$x->setValue('eh_cidadao', 'yes');
 $x->setValue('data_nascimento', '1950-05-21');
 
 print_r($x->getMetaVar('idade'));
@@ -35,6 +34,20 @@ echo "\n\n";
 print_r($x->getValue('elegivel_grant',true));
 //print_r($x->getValue('idade',true));
 echo "\n\n";
+print_r($x->evaluate());
+echo "\n\n\n\n";
+print_r(\xcranium\kdb\KFormula::$vars);
+
+$y = KDB::get("teste1")->getAllVars();
+echo "\n\n\n\n";
+
+print_r($y);
+
+echo "\n\n =========================================== \n";
+
+$x->setValue('eh_cidadao', 'yes');
+
+
 print_r($x->evaluate());
 echo "\n\n\n\n";
 print_r(\xcranium\kdb\KFormula::$vars);

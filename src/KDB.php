@@ -45,7 +45,7 @@ class KDB {
 	    // $this->parse($textDefinition);
 	}
 	
-	echo "KDB $kdnName created";
+	//echo "KDB $kdnName created";
     }
     
     
@@ -150,6 +150,9 @@ class KDB {
 	// try to figurate which variables must be evaluated (chaining) and which 
 	// should be updated
 	
+        KFormula::$currentKDB = $this;
+        
+        
 	foreach ($this->lsVars as $varName => $varObj) {
 	    KFormula::$vars[$varName] = $varObj->getValue();
 	}
@@ -238,8 +241,8 @@ class KDB {
 	    
 	    $formula = $this->getVar($varName)->getFormula();
 	    if ($formula) {
-		echo "\n === $varName ";
-		$result = KFormula::evaluate($formula);
+		//echo "\n === $varName ";
+		$result = KFormula::evaluate($formula, $varName);
 	    }
 	}
 	
@@ -247,6 +250,17 @@ class KDB {
 	
 	return $lsResp;
     }
+    
+    
+    
+    public function getAllVars() {
+        $resp = [];
+        foreach ($this->lsVars as $varName => $var) {
+            $resp[$varName] = $var->getValue();
+        }
+        return $resp;
+    }
+    
     
 }
 
