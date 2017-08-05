@@ -39,7 +39,7 @@ print_r($x->evaluate());
 echo "\n\n\n\n";
 print_r(\xcranium\kdb\KFormula::$vars);
 
-$y = KDB::get("teste1")->getAllVars();
+$y = KDB::get("teste1")->getAllValues();
 echo "\n\n\n\n";
 
 print_r($y);

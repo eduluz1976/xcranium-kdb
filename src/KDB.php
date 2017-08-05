@@ -4,13 +4,15 @@ namespace xcranium\kdb;
 
 class KDB {
     
+    const VERSION = 1;
+    
     protected static $lsKDBs = [];
     protected $name;
     protected $textDefinition = false;
     protected $lsVars = [];
     protected $lsTags = [];
     protected $lsTargets = [];
-    
+    protected $version;
     
     /**
      * 
@@ -45,9 +47,15 @@ class KDB {
 	    // $this->parse($textDefinition);
 	}
 	
+	$this->version = ''. self::VERSION .microtime(true) . strftime("%03d",rand(0, 1000));
 	//echo "KDB $kdnName created";
     }
     
+    
+    
+    public function getVersion() {
+	return $this->version;
+    }
     
     /**
      * 
@@ -62,10 +70,7 @@ class KDB {
 	
 	$this->lsVars[$name] = $v;
 	
-	
-	
 	return $this;
-//	return $this->lsVars[$name];
     }
     
     
@@ -154,6 +159,9 @@ class KDB {
         
         
 	foreach ($this->lsVars as $varName => $varObj) {
+	    if ($forceAll) {
+		$this->getValue($varName,true);
+	    }
 	    KFormula::$vars[$varName] = $varObj->getValue();
 	}
 	
@@ -239,10 +247,12 @@ class KDB {
 	
 	foreach ($ls4 as $varName) {
 	    
-	    $formula = $this->getVar($varName)->getFormula();
-	    if ($formula) {
-		//echo "\n === $varName ";
+	    try {
+		$formula = $this->getVar($varName)->getFormula();
 		$result = KFormula::evaluate($formula, $varName);
+	    } catch (KException $ex) {		
+		// is not an error
+		//echo "\n ".$ex->getMessage() . " ($varName) \n";
 	    }
 	}
 	
@@ -253,12 +263,17 @@ class KDB {
     
     
     
-    public function getAllVars() {
+    public function getAllValues() {
         $resp = [];
         foreach ($this->lsVars as $varName => $var) {
             $resp[$varName] = $var->getValue();
         }
         return $resp;
+    }
+    
+    
+    public function getAllVas() {        
+        return $this->lsVars;
     }
     
     

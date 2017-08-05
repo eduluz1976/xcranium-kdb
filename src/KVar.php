@@ -85,11 +85,17 @@ class KVar {
 	return $this->isMissing;
     }
     
+    /**
+     * @TODO get all references and test return (or use exception)  
+     * @return type
+     * @throws xcranium\kdb\KException
+     */
     public function getFormula() {
 	if (property_exists($this, "formula")) {
 	    return $this->formula;
 	}
-	return null;
+	
+	throw KException::get(KException::FORMULA_NOT_EXISTS);
     }
     
     
